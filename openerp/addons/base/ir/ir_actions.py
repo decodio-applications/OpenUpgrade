@@ -208,7 +208,7 @@ class ir_actions_report_xml(osv.osv):
     _name = 'ir.actions.report.xml'
     _inherit = 'ir.actions.actions'
     _table = 'ir_act_report_xml'
-    _sequence = 'ir_actions_id_seq'
+    # _sequence = 'ir_actions_id_seq'
     _order = 'name'
     _columns = {
         'type': fields.char('Action Type', required=True),
@@ -266,7 +266,7 @@ class ir_actions_act_window(osv.osv):
     _name = 'ir.actions.act_window'
     _table = 'ir_act_window'
     _inherit = 'ir.actions.actions'
-    _sequence = 'ir_actions_id_seq'
+    # _sequence = 'ir_actions_id_seq'
     _order = 'name'
 
     def _check_model(self, cr, uid, ids, context=None):
@@ -472,7 +472,7 @@ class ir_actions_act_url(osv.osv):
     _name = 'ir.actions.act_url'
     _table = 'ir_act_url'
     _inherit = 'ir.actions.actions'
-    _sequence = 'ir_actions_id_seq'
+    # _sequence = 'ir_actions_id_seq'
     _order = 'name'
     _columns = {
         'name': fields.char('Action Name', required=True, translate=True),
@@ -515,7 +515,7 @@ class ir_actions_server(osv.osv):
     _name = 'ir.actions.server'
     _table = 'ir_act_server'
     _inherit = 'ir.actions.actions'
-    _sequence = 'ir_actions_id_seq'
+    # _sequence = 'ir_actions_id_seq'
     _order = 'sequence,name'
 
     def _select_objects(self, cr, uid, context=None):
@@ -1111,7 +1111,7 @@ class ir_actions_server(osv.osv):
 class ir_server_object_lines(osv.osv):
     _name = 'ir.server.object.lines'
     _description = 'Server Action value mapping'
-    _sequence = 'ir_actions_id_seq'
+    # _sequence = 'ir_actions_id_seq'
 
     _columns = {
         'server_id': fields.many2one('ir.actions.server', 'Related Server Action', ondelete='cascade'),
@@ -1274,7 +1274,7 @@ class ir_actions_act_client(osv.osv):
     _name = 'ir.actions.client'
     _inherit = 'ir.actions.actions'
     _table = 'ir_act_client'
-    _sequence = 'ir_actions_id_seq'
+    # _sequence = 'ir_actions_id_seq'
     _order = 'name'
 
     def _get_params(self, cr, uid, ids, field_name, arg, context):

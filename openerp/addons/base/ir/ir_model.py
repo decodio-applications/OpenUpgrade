@@ -137,7 +137,8 @@ class ir_model(osv.osv):
             if result and result[0] == 'v':
                 cr.execute('DROP view %s' % (model_pool._table,))
             elif result and result[0] == 'r':
-                cr.execute('DROP TABLE %s CASCADE' % (model_pool._table,))
+                _logger.warning('NOT dropping table: %s CASCADE', model_pool._table)
+                # cr.execute('DROP TABLE %s CASCADE' % (model_pool._table,))
         return True
 
     def unlink(self, cr, user, ids, context=None):
@@ -436,7 +437,9 @@ class ir_model_fields(osv.osv):
                        (model._table, field.name))
             column_name = cr.fetchone()
             if column_name and (result and result[0] == 'r'):
-                cr.execute('ALTER table "%s" DROP column "%s" cascade' % (model._table, field.name))
+                _logger.warning('NOT cascade dropping column %s.%s', model._table, field.name)
+                cr.execute('ALTER TABLE "%s" ALTER COLUMN "%s" DROP NOT NULL' % (model._table, field.name))
+                # cr.execute('ALTER table "%s" DROP column "%s" cascade' % (model._table, field.name))
             if field.state == 'manual' and field.ttype == 'many2many':
                 rel_name = field.relation_table or model._fields[field.name].relation
                 tables_to_drop.add(rel_name)
@@ -450,7 +453,8 @@ class ir_model_fields(osv.osv):
                        (tuple(tables_to_drop), tuple(ids)))
             tables_to_keep = set(row[0] for row in cr.fetchall())
             for rel_name in tables_to_drop - tables_to_keep:
-                cr.execute('DROP TABLE "%s"' % rel_name)
+                _logger.warning('Not dropping table %s.', rel_name)
+                # cr.execute('DROP TABLE "%s"' % rel_name)
 
         return True
 

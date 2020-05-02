@@ -191,7 +191,9 @@ def get_pg_type(f, type_override=None):
         if f.digits is not None:
             pg_type = ('numeric', 'NUMERIC')
         else:
-            pg_type = ('float8', 'DOUBLE PRECISION')
+            # DECODIO: use pg numeric type for python float
+            # pg_type = ('float8', 'DOUBLE PRECISION')
+            pg_type = ('numeric', 'NUMERIC')
     elif issubclass(field_type, (fields.char, fields.reference)):
         pg_type = ('varchar', pg_varchar(f.size))
     elif issubclass(field_type, fields.selection):
@@ -2549,11 +2551,13 @@ class BaseModel(object):
                         f_pg_notnull = res['attnotnull']
                         if isinstance(f, fields.function) and not f.store and\
                                 not getattr(f, 'nodrop', False):
-                            _logger.info('column %s (%s) converted to a function, removed from table %s',
+                            _logger.info('column %s (%s) converted to a function, NOT removed from table %s',
                                          k, f.string, self._table)
-                            cr.execute('ALTER TABLE "%s" DROP COLUMN "%s" CASCADE' % (self._table, k))
-                            cr.commit()
-                            _schema.debug("Table '%s': dropped column '%s' with cascade",
+                            cr.execute(
+                                'ALTER TABLE "%s" ALTER COLUMN "%s" DROP NOT NULL' % (
+                                self._table, k))
+                            #cr.execute('ALTER TABLE "%s" DROP COLUMN "%s" CASCADE' % (self._table, k))
+                            _schema.debug("Table '%s': NOT dropping column '%s' with cascade",
                                 self._table, k)
                             f_obj_type = None
                         else:
@@ -2777,7 +2781,7 @@ class BaseModel(object):
 
 
     def _create_table(self, cr):
-        cr.execute('CREATE TABLE "%s" (id SERIAL NOT NULL, PRIMARY KEY(id))' % (self._table,))
+        cr.execute('CREATE TABLE "%s" (id BIGSERIAL NOT NULL, PRIMARY KEY(id))' % (self._table,))
         cr.execute(("COMMENT ON TABLE \"%s\" IS %%s" % self._table), (self._description,))
         _schema.debug("Table '%s': created", self._table)
 
@@ -4257,7 +4261,7 @@ class BaseModel(object):
             #   (column_name, sql_formula)
             # Those tuples will be used by the string formatting for the INSERT
             # statement below.
-            ('id', "nextval('%s')" % self._sequence),
+            # ('id', "nextval('%s')" % self._sequence),
         ]
 
         upd_todo = []
