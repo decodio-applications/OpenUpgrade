@@ -674,7 +674,7 @@ class BaseModel(object):
 
             cls._sql_constraints += base._sql_constraints
 
-        cls._sequence = cls._sequence or (cls._table + '_id_seq')
+        cls._sequence = cls._sequence or 'ir_serial_id_seq'  # (cls._table + '_id_seq')
         cls._constraints = cls._constraints.values()
 
         # update _inherits_children of parent models
@@ -2445,6 +2445,7 @@ class BaseModel(object):
                                 ('text', 'char', column_type[1], '::' + column_type[1]),
                                 ('varchar', 'text', 'TEXT', ''),
                                 ('int4', 'float', column_type[1], '::' + column_type[1]),
+                                ('int8', 'float', column_type[1], '::' + column_type[1]),
                                 ('date', 'datetime', 'TIMESTAMP', '::TIMESTAMP'),
                                 ('timestamp', 'date', 'date', '::date'),
                                 ('numeric', 'float', column_type[1], '::' + column_type[1]),
@@ -3960,7 +3961,7 @@ class BaseModel(object):
         # Those tuples will be used by the string formatting for the INSERT
         # statement below.
         updates = [
-            ('id', "nextval('%s')" % self._sequence),
+            # ('id', "nextval('%s')" % self._sequence), # Use db default for id
         ]
 
         upd_todo = []

@@ -87,7 +87,7 @@ class IrActionsReportXml(models.Model):
     _name = 'ir.actions.report.xml'
     _inherit = 'ir.actions.actions'
     _table = 'ir_act_report_xml'
-    _sequence = 'ir_actions_id_seq'
+    # _sequence = 'ir_actions_id_seq'
     _order = 'name'
 
     name = fields.Char(translate=True)
@@ -417,7 +417,7 @@ class IrActionsActUrl(models.Model):
     _name = 'ir.actions.act_url'
     _table = 'ir_act_url'
     _inherit = 'ir.actions.actions'
-    _sequence = 'ir_actions_id_seq'
+    # _sequence = 'ir_actions_id_seq'
     _order = 'name'
 
     name = fields.Char(string='Action Name', translate=True)
@@ -452,7 +452,7 @@ class IrActionsServer(models.Model):
     _name = 'ir.actions.server'
     _table = 'ir_act_server'
     _inherit = 'ir.actions.actions'
-    _sequence = 'ir_actions_id_seq'
+    # _sequence = 'ir_actions_id_seq'
     _order = 'sequence,name'
 
     DEFAULT_PYTHON_CODE = """# Available variables:
@@ -1021,7 +1021,7 @@ class IrActionsServer(models.Model):
 class IrServerObjectLines(models.Model):
     _name = 'ir.server.object.lines'
     _description = 'Server Action value mapping'
-    _sequence = 'ir_actions_id_seq'
+    # _sequence = 'ir_actions_id_seq'
 
     server_id = fields.Many2one('ir.actions.server', string='Related Server Action', ondelete='cascade')
     col1 = fields.Many2one('ir.model.fields', string='Field', required=True)
@@ -1156,7 +1156,7 @@ class IrActionsActClient(models.Model):
     _name = 'ir.actions.client'
     _inherit = 'ir.actions.actions'
     _table = 'ir_act_client'
-    _sequence = 'ir_actions_id_seq'
+    # _sequence = 'ir_actions_id_seq'
     _order = 'name'
 
     name = fields.Char(string='Action Name', translate=True)
