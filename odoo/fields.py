@@ -1175,7 +1175,7 @@ class Boolean(Field):
 
 class Integer(Field):
     type = 'integer'
-    column_type = ('int4', 'int4')
+    column_type = ('int8', 'int8')
     _slots = {
         'group_operator': 'sum',
     }
@@ -1217,7 +1217,7 @@ class Float(Field):
                    cursor and returning a pair (total, decimal)
     """
     type = 'float'
-    column_cast_from = ('int4', 'numeric', 'float8')
+    column_cast_from = ('int4', 'int8', 'numeric', 'float8')
     _slots = {
         '_digits': None,                # digits argument passed to class initializer
         'group_operator': 'sum',
@@ -1228,13 +1228,15 @@ class Float(Field):
 
     @property
     def column_type(self):
+        # DECODIO: Always use numeric
+        return ('numeric', 'numeric')
         # Explicit support for "falsy" digits (0, False) to indicate a NUMERIC
         # field with no fixed precision. The values are saved in the database
         # with all significant digits.
         # FLOAT8 type is still the default when there is no precision because it
         # is faster for most operations (sums, etc.)
-        return ('numeric', 'numeric') if self.digits is not None else \
-               ('float8', 'double precision')
+        # return ('numeric', 'numeric') if self.digits is not None else \
+        #       ('float8', 'double precision')
 
     @property
     def digits(self):
@@ -1854,7 +1856,8 @@ class Selection(Field):
     def convert_to_cache(self, value, record, validate=True):
         if not validate:
             return value or False
-        if value and self.column_type[0] == 'int4':
+        # if value and self.column_type[0] == 'int4':
+        if value and self.column_type[0] in ('int4', 'int8'):
             value = int(value)
         if value in self.get_values(record.env):
             return value
@@ -1971,7 +1974,7 @@ class Many2one(_Relational):
     fields or field extensions.
     """
     type = 'many2one'
-    column_type = ('int4', 'int4')
+    column_type = ('int8', 'int8')
     _slots = {
         'ondelete': 'set null',         # what to do when value is deleted
         'auto_join': False,             # whether joins are generated upon search
@@ -2465,9 +2468,10 @@ class Many2many(_RelationalMulti):
                                  model, self.relation, self._module)
         if not sql.table_exists(cr, self.relation):
             comodel = model.env[self.comodel_name]
+            # DECODIO BIGINT
             query = """
-                CREATE TABLE "{rel}" ("{id1}" INTEGER NOT NULL,
-                                      "{id2}" INTEGER NOT NULL,
+                CREATE TABLE "{rel}" ("{id1}" BIGINT NOT NULL,
+                                      "{id2}" BIGINT NOT NULL,
                                       UNIQUE("{id1}","{id2}"));
                 COMMENT ON TABLE "{rel}" IS %s;
                 CREATE INDEX ON "{rel}" ("{id1}");
@@ -2584,7 +2588,7 @@ class Many2many(_RelationalMulti):
 class Id(Field):
     """ Special case for field 'id'. """
     type = 'integer'
-    column_type = ('int4', 'int4')
+    column_type = ('int8', 'int8')
     _slots = {
         'string': 'ID',
         'store': True,

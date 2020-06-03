@@ -553,9 +553,9 @@ class IrModelFields(models.Model):
                 # TODO: Refactor this brol in master
                 if tools.column_exists(self._cr, model._table, field.name) and \
                         tools.table_kind(self._cr, model._table) == 'r':
-                    self._cr.execute('ALTER TABLE "%s" DROP COLUMN "%s" CASCADE' % (
-                        model._table, field.name,
-                    ))
+                    _logger.warning('NOT cascade dropping column %s.%s', model._table, field.name)
+                    # self._cr.execute('ALTER TABLE "%s" DROP COLUMN "%s" CASCADE' % (model._table, field.name,))
+                    self._cr.execute('ALTER TABLE "%s" ALTER COLUMN "%s" DROP NOT NULL' % (model._table, field.name))
                 if field.state == 'manual' and field.ttype == 'many2many':
                     rel_name = field.relation_table or model._fields[field.name].relation
                     tables_to_drop.add(rel_name)
@@ -569,7 +569,8 @@ class IrModelFields(models.Model):
                              (tuple(tables_to_drop), tuple(self.ids)))
             tables_to_keep = set(row[0] for row in self._cr.fetchall())
             for rel_name in tables_to_drop - tables_to_keep:
-                self._cr.execute('DROP TABLE "%s"' % rel_name)
+                _logger.warning('Not dropping table %s.', rel_name)
+                # self._cr.execute('DROP TABLE "%s"' % rel_name)
 
         return True
 
