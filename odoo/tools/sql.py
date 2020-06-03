@@ -48,7 +48,9 @@ def table_kind(cr, tablename):
 
 def create_model_table(cr, tablename, comment=None):
     """ Create the table for a model. """
-    cr.execute('CREATE TABLE "{}" (id SERIAL NOT NULL, PRIMARY KEY(id))'.format(tablename))
+    # DECODIO
+    # cr.execute('CREATE TABLE "{}" (id SERIAL NOT NULL, PRIMARY KEY(id))'.format(tablename))
+    cr.execute('CREATE TABLE "{}" (id BIGSERIAL NOT NULL, PRIMARY KEY(id))'.format(tablename))
     if comment:
         cr.execute('COMMENT ON TABLE "{}" IS %s'.format(tablename), (comment,))
     _schema.debug("Table %r: created", tablename)
@@ -99,7 +101,15 @@ def convert_column(cr, tablename, columnname, columntype):
             ALTER TABLE "{0}" DROP COLUMN  __temp_type_cast CASCADE;
         '''
         cr.execute(query.format(tablename, columnname, columntype))
-    _schema.debug("Table %r: column %r changed to type %s", tablename, columnname, columntype)
+    _schema.warning("Table %r: column %r changed to type %s", tablename, columnname, columntype)
+    # [DECODIO]: Warning about possible data loss
+    if columntype == 'date':
+        _schema.warning("Table %r: column %r converting timestamp to date "
+                        "TIME IS LOST!", tablename, columnname)
+    if columntype == 'double precision':
+        _schema.warning("Table %r: column %r converting numeric to FLOAT "
+                        "PRECISION IS LOST!", tablename, columnname)
+
 
 def set_not_null(cr, tablename, columnname):
     """ Add a NOT NULL constraint on the given column. """
