@@ -9,13 +9,24 @@ def _replace_paypal_view_template_id(env):
     as invalid), we need to switch the view for possible records of this
     provider.
     """
-    env['payment.acquirer'].search([
+    acquirers = env['payment.acquirer'].search([
         ('provider', '=', 'paypal'),
         ('view_template_id', '=', env.ref(
             'payment_paypal.paypal_acquirer_button').id),
-    ]).write({
-        'view_template_id': env.ref('payment_paypal.paypal_form').id,
-    })
+    ])
+    if not acquirers:
+        return
+    # Do it through SQL for avoiding other validations
+    openupgrade.logged_query(
+        env.cr, """
+        UPDATE payment_acquirer
+        SET view_template_id = %s
+        WHERE id IN %s
+        """, (
+            env.ref('payment_paypal.paypal_form').id,
+            tuple(acquirers.ids),
+        )
+    )
 
 
 @openupgrade.migrate()
